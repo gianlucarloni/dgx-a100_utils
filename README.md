@@ -17,4 +17,4 @@ With this configuration, any changes made outside the current folder will not be
 
 When you have to launch a process (container) that uses possibly mupliple GPUs, it is helpful to automatically detect which of the available GPU nodes are preferable. This is usually associated with their 
 
-In [docker_run_distributed.sh](https://github.com/gianlucarloni/dgx-a100_utils/blob/3de9854563b738161e782f88ab4cae4c14952044/docker_run_distributed.sh) I give an example of a script that, before launching a multi-GPU container, checks which nodes to select and assigns them to the docker run command.
+In [docker_run_distributed.sh](https://github.com/gianlucarloni/dgx-a100_utils/blob/3de9854563b738161e782f88ab4cae4c14952044/docker_run_distributed.sh) I give an example of a script that, before launching a multi-GPU container, checks which nodes to select and assigns them to the docker run command. That bash (.sh) script starts by taking user's input from stdin (prompt via keyboard) to allocate the right number of GPUs (`NUM_GPUS=$(($1))`). For instance, if the user wants to utilize 2 GPUs will pass `2` as first (an only) argument of the bash script.
