@@ -9,4 +9,4 @@ Importantly, this infrastructure features 8x NVIDIA A100 40GB Tensor Core GPUs, 
 ## Why using Docker
 
 As an Institute policy, it has been strongly recommended to use [Docker](https://www.docker.com/) to create the environment with the necessary software and launch processes.
-When launching a process via 'docker run', the '--cpus' option is strongly recommended to avoid incorrectly occupying the entirety of CPUs. A heuristic for specifying the number of cpus to use is to choose a value between '8*nGPUs' and '24*nGPUs' where 'nGPUs' indicates the number of GPUs required.
+When launching a process via `docker run`, the `--cpus` option is strongly recommended to avoid incorrectly occupying the entirety of CPUs. A heuristic for specifying the number of cpus to use is to choose a value between `8*nGPUs` and `24*nGPUs` where `nGPUs` indicates the number of GPUs required.
