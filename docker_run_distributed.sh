@@ -39,7 +39,7 @@ do
     if [ $c -lt $NUM_GPUS ]
     then
         arrVar+="$(($line-1)),";
-        c+=1
+        c=$[c+1]
     else
         arrVar+="$(($line-1))";
     fi;
