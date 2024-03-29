@@ -27,13 +27,19 @@ And you're good to go!
 
 ## Optimize 'num_workers' in PyTorch DataLoaders
 
-To avoid blocking computation code with data loading, PyTorch (`torch`) provides an easy switch to perform multi-process data loading by simply setting the argument `num_workers` to a positive integer. This is especialyl useful when workinkg with large image dataset, such as chest x-ray images for DL architectures. Setting the argument `num_workers` as a positive integer will turn on multi-process data loading with the specified number of loader worker processes.
+To avoid blocking computation code with data loading, PyTorch (`torch`) provides an easy switch to perform multi-process data loading by simply setting the argument `num_workers` to a positive integer. This is especialyl useful when workinkg with large image dataset, such as [chest x-ray images for DL architectures](https://github.com/gianlucarloni/causal_medimg). Setting the argument `num_workers` as a positive integer will turn on multi-process data loading with the specified number of loader worker processes.
 
 This is done within the `DataLoader` class definition:
 `torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=None, sampler=None, batch_sampler=None, num_workers=0, collate_fn=None, pin_memory=False, drop_last=False, timeout=0, worker_init_fn=None, multiprocessing_context=None, generator=None, *, prefetch_factor=None, persistent_workers=False, pin_memory_device='')`
 
-and here I show you how increasing the number of workers actually improves the speed of loading and processing, thus ultimately of training, during deep learning experiments.
+and, below, I show how increasing the number of workers actually improves the speed of loading and processing, thus ultimately of training, during deep learning experiments.
 
-### Case 1: not using 'num_workers' (default: 'num_workers=0')
-  
+### Compare default ('num_workers=0') and set 'num_workers=8'
 
+The figure below depicts the output of the `nvtop` command from a terminal within the NVIDIA DGX server, while executing the same python script with two different `num_workers` values:
+
+<img src="./impact_of_increasedNumWorkers.png" width=600>
+
+The first row represents the case where I ran the script on CUDA device '1' with default settings ('num_workers=0'): you can see that the GPU time-unit utilization is only 17 per cent, while the CPU one is 2147 %. As a result, the processing speed observed with `tqdm` during training was merely of **1.55 s/it** (thus, drastically less than one batch per second!). Observing high CPU usage and low GPU utilization during the training of a PyTorch model can indicate that my script is creating a bottleneck, most probably caused by an inefficient data loading. Indeed, it needs to spend huge efforts with loading over 110000 images: the CPU might be working hard to load and preprocess the data, while the GPU waits for the data to be ready.
+
+To mitigate that effect, I optimized the data loading process by using a sufficient number of worker threads in my DataLoader. As you can see from the second row in the figure above, the GPU utilization increased to 96 % and the cPU got back to usual regime values of 100%. As a result, the processing speed observed with `tqdm` during training skyrocketed to **4.15 it/s** (thus, nicely more than four batches per second!).
