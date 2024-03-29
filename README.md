@@ -1,4 +1,4 @@
-# DGX-A100 UTILITY REPO
+# NVIDIA DGX-A100 UTILITY REPO
 This tiny repo contains some useful scripts and bash commands to leverage the full potential of the NVIDIA DGX-A100 infrastructure, such as utilizing Docker and automatically deciding the best GPU node(s) to use when running a new job.
 
 ## Rationale
@@ -24,3 +24,16 @@ After that, the script leverages the `nvidia-smi` functionality. That is a comma
 Specifically, by running `nvidia-smi --query-gpu=memory.used,utilization.gpu --format=csv` we query the output of nvidia-smi to give us the amount of memory usage and percentage utilization of each GPU. In the script, the lines of code that go from this query to the `echo "The top $NUM_GPUS free GPUs are: $arrVar"` line, automatically compute a score of goodness to each GPU node based on their memory usage and percentage utilization, sort them in ascending numerical order, and assign the top `NUM_GPUS` free GPUs to a variable `arrVar`. After that, comes the `docker run` command, with certain flags (arguments) to set specific values. It is in this step that you have to specify the `--gpus` argument to the value of `arrVar` (note: here, a `arrVar3` is used instead, which is a custom string variable based on `arrVar` to properly match the Docker synthax).
 
 And you're good to go!
+
+## Optimize 'num_workers' in PyTorch DataLoaders
+
+To avoid blocking computation code with data loading, PyTorch (`torch`) provides an easy switch to perform multi-process data loading by simply setting the argument `num_workers` to a positive integer. This is especialyl useful when workinkg with large image dataset, such as chest x-ray images for DL architectures. Setting the argument `num_workers` as a positive integer will turn on multi-process data loading with the specified number of loader worker processes.
+
+This is done within the `DataLoader` class definition:
+`torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=None, sampler=None, batch_sampler=None, num_workers=0, collate_fn=None, pin_memory=False, drop_last=False, timeout=0, worker_init_fn=None, multiprocessing_context=None, generator=None, *, prefetch_factor=None, persistent_workers=False, pin_memory_device='')`
+
+and here I show you how increasing the number of workers actually improves the speed of loading and processing, thus ultimately of training, during deep learning experiments.
+
+### Case 1: not using 'num_workers' (default: 'num_workers=0')
+  
+
